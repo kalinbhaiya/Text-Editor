@@ -101,11 +101,13 @@ align_right_icon = tk.PhotoImage(file='icons2/align_right.png')
 align_right_btn = ttk.Button(tool_bar, image=align_right_icon)
 align_right_btn.grid(row=0, column=8, padx=5)
 
-time_label1 = ttk.Label(main_application, text='Time :',font='cursive 20 bold italic',foreground='black').place(x=650)
+time_label1 = ttk.Label(main_application, text='Time :',font='cursive 20 bold italic',foreground='black')
+time_label1.place(x=650)
 time_label = ttk.Label(main_application,text='02:30 PM',font='cursive 20 bold italic',foreground='gray')
 time_label.place(x=740,y=1)
 
-date_label1 = ttk.Label(main_application, text='Date :',font='cursive 20 bold italic',foreground='black').place(x=950)
+date_label1 = ttk.Label(main_application, text='Date :',font='cursive 20 bold italic',foreground='black')
+date_label1.place(x=950)
 date_label = ttk.Label(main_application, text=datetime.date.today(),font='cursive 20 bold italic',foreground='gray')
 date_label.place(x=1035,y=1)
 
@@ -350,13 +352,21 @@ def hide_toolbar():
     global show_toolbar
     if show_toolbar:
         tool_bar.pack_forget()
-        show_toolbar = False 
+        time_label.place_forget()
+        time_label1.place_forget()
+        date_label.place_forget()
+        date_label1.place_forget()
+        show_toolbar = False
     else :
         text_editor.pack_forget()
         status_bar.pack_forget()
         tool_bar.pack(side=tk.TOP, fill=tk.X)
+        time_label.place(x=740,y=1)
+        time_label1.place(x=650)
+        date_label.place(x=1035,y=1)
+        date_label1.place(x=950)
+        status_bar.pack(side=tk.TOP,pady=5,fill=tk.X)
         text_editor.pack(fill=tk.BOTH, expand=True)
-        status_bar.pack(side=tk.BOTTOM)
         show_toolbar = True 
 
 def hide_statusbar():
