@@ -3,12 +3,13 @@ from tkinter import ttk
 from tkinter import font, colorchooser, filedialog, messagebox
 import os 
 import webbrowser as wb
+import time
+import datetime
 
 main_application = tk.Tk()
 main_application.geometry('1200x800')
 main_application.title('Viper - Text Editor')
 main_application.wm_iconbitmap('icon.ico')
-
 main_menu = tk.Menu()
 
 file = tk.Menu(main_menu, tearoff=False)
@@ -55,7 +56,10 @@ main_menu.add_cascade(label='Color Theme', menu=color_theme)
 
 tool_bar = ttk.Label(main_application)
 tool_bar.pack(side=tk.TOP, fill=tk.X)
+status_bar = ttk.Label(main_application, text = 'Status Bar',relief=tk.GROOVE)
+status_bar.pack(side=tk.TOP,pady=5,fill=tk.X)
 
+status_bar.config(anchor='center')
 font_tuple = tk.font.families()
 font_family = tk.StringVar()
 font_box = ttk.Combobox(tool_bar, width=30, textvariable=font_family, state='readonly')
@@ -97,11 +101,18 @@ align_right_icon = tk.PhotoImage(file='icons2/align_right.png')
 align_right_btn = ttk.Button(tool_bar, image=align_right_icon)
 align_right_btn.grid(row=0, column=8, padx=5)
 
+time_label1 = ttk.Label(main_application, text='Time :',font='cursive 20 bold italic',foreground='black').place(x=650)
+time_label = ttk.Label(main_application,text='02:30 PM',font='cursive 20 bold italic',foreground='gray')
+time_label.place(x=740,y=1)
+
+date_label1 = ttk.Label(main_application, text='Date :',font='cursive 20 bold italic',foreground='black').place(x=950)
+date_label = ttk.Label(main_application, text=datetime.date.today(),font='cursive 20 bold italic',foreground='gray')
+date_label.place(x=1035,y=1)
+
 text_editor = tk.Text(main_application)
 text_editor.config(wrap='word', relief=tk.SUNKEN)
 
 scroll_bar = tk.Scrollbar(main_application)
-text_editor.focus_set()
 scroll_bar.pack(side=tk.RIGHT, fill=tk.Y)
 text_editor.pack(fill=tk.BOTH, expand=True)
 scroll_bar.config(command=text_editor.yview)
@@ -109,6 +120,13 @@ text_editor.config(yscrollcommand=scroll_bar.set)
 
 current_font_family = 'Arial'
 current_font_size = 12
+
+def time_changed():
+    time_now = time.strftime('%I:%M:%S %p')
+    time_label.config(text=time_now)
+    time_label.after(1000,time_changed)
+time_changed()
+
 
 def change_font(event=None):
     global current_font_family
@@ -174,8 +192,7 @@ def align_right():
 align_right_btn.configure(command=align_right)
 text_editor.configure(font=('Arial', 12))
 
-status_bar = ttk.Label(main_application, text = 'Status Bar')
-status_bar.pack(side=tk.BOTTOM)
+
 
 text_changed = False 
 def changed(event=None):
@@ -315,10 +332,13 @@ def find_func(event=None):
     replace_button.grid(row=2, column=1, padx=8, pady=4)
     find_dialogue.mainloop()
 
+def delete_all():
+    text_editor.delete(1.0, tk.END)
+
 edit.add_command(label='Copy', image=copy_icon, compound=tk.LEFT, accelerator='Ctrl+C', command=lambda:text_editor.event_generate("<Control c>"))
 edit.add_command(label='Paste', image=paste_icon, compound=tk.LEFT, accelerator='Ctrl+V', command=lambda:text_editor.event_generate("<Control v>"))
 edit.add_command(label='Cut', image=cut_icon, compound=tk.LEFT, accelerator='Ctrl+X', command=lambda:text_editor.event_generate("<Control x>"))
-edit.add_command(label='Clear All', image=clear_all_icon, compound=tk.LEFT, accelerator='Ctrl+Alt+X', command= lambda:text_editor.delete(1.0, tk.END))
+edit.add_command(label='Clear All', image=clear_all_icon, compound=tk.LEFT, accelerator='Ctrl+Alt+X', command=delete_all)
 edit.add_command(label='Find', image=find_icon, compound=tk.LEFT, accelerator='Ctrl+F', command = find_func)
 
 show_statusbar = tk.BooleanVar()
@@ -345,8 +365,10 @@ def hide_statusbar():
         status_bar.pack_forget()
         show_statusbar = False 
     else :
-        status_bar.pack(side=tk.BOTTOM)
+        text_editor.pack_forget()
+        status_bar.pack(side=tk.TOP,pady=5,fill=tk.X)
         show_statusbar = True
+        text_editor.pack(fill=tk.BOTH, expand=True)
 view.add_checkbutton(label='Tool Bar',onvalue=True, offvalue=0,variable = show_toolbar, image=tool_bar_icon, compound=tk.LEFT, command=hide_toolbar)
 view.add_checkbutton(label='Status Bar',onvalue=1, offvalue=False,variable = show_statusbar, image=status_bar_icon, compound=tk.LEFT, command=hide_statusbar)
 
@@ -362,7 +384,7 @@ for i in color_dict:
 main_application.config(menu=main_menu)
 
 def source():
-    wb.open_new_tab('')
+    wb.open_new_tab('https://github.com/kalinbhaiya/Text-Editor')
 
 def about():
     messagebox.showinfo('Viper', "Author : \nMuhammad Muzammil Alam\
@@ -379,9 +401,14 @@ def credits():
 
 help = tk.Menu(main_menu, tearoff=0)
 
+def search(event=None):
+    query = text_editor.get(1.0,tk.END)
+    wb.open_new_tab(f'https://www.google.com/search?q={query}&form=NPCTXT')
+
 help.add_command(label='Credits',command=credits)
 help.add_command(label='Source Code',command=source)
 help.add_command(label='About Author',command=about)
+help.add_command(label='Search On Internet',command=search,accelerator='Ctrl+W')
 main_menu.add_cascade(label='Help',menu=help)
 
 main_application.bind("<Control-n>", new_file)
@@ -390,4 +417,5 @@ main_application.bind("<Control-s>", save_file)
 main_application.bind("<Control-Alt-s>", save_as)
 main_application.bind("<Control-q>", exit_func)
 main_application.bind("<Control-f>", find_func)
+main_application.bind("<Control-w>",search)
 main_application.mainloop()
