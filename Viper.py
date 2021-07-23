@@ -334,13 +334,13 @@ def find_func(event=None):
     replace_button.grid(row=2, column=1, padx=8, pady=4)
     find_dialogue.mainloop()
 
-def delete_all():
+def delete_all(event=None):
     text_editor.delete(1.0, tk.END)
 
 edit.add_command(label='Copy', image=copy_icon, compound=tk.LEFT, accelerator='Ctrl+C', command=lambda:text_editor.event_generate("<Control c>"))
 edit.add_command(label='Paste', image=paste_icon, compound=tk.LEFT, accelerator='Ctrl+V', command=lambda:text_editor.event_generate("<Control v>"))
 edit.add_command(label='Cut', image=cut_icon, compound=tk.LEFT, accelerator='Ctrl+X', command=lambda:text_editor.event_generate("<Control x>"))
-edit.add_command(label='Clear All', image=clear_all_icon, compound=tk.LEFT, accelerator='Ctrl+Alt+X', command=delete_all)
+edit.add_command(label='Clear All', image=clear_all_icon, compound=tk.LEFT, accelerator='Ctrl+Alt+x', command=delete_all)
 edit.add_command(label='Find', image=find_icon, compound=tk.LEFT, accelerator='Ctrl+F', command = find_func)
 
 show_statusbar = tk.BooleanVar()
@@ -428,4 +428,5 @@ main_application.bind("<Control-Alt-s>", save_as)
 main_application.bind("<Control-q>", exit_func)
 main_application.bind("<Control-f>", find_func)
 main_application.bind("<Control-w>",search)
+main_application.bind("<Control-Alt-x>",delete_all)
 main_application.mainloop()
